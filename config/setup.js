@@ -111,7 +111,7 @@ function setGLAccount() {
  * Some keyring manager functions are taken from
  * Mailvelope: https://github.com/mailvelope/mailvelope
  *******************************************************/
-// Read the key info
+// Read the key info KEEP THIS FUNCTION AROUND
 function readKeys(armored) {
     let parsedKey = openpgp.key.readArmored(armored);
     if (parsedKey.err) {
@@ -360,14 +360,91 @@ var retrieveObject = function(id) {
 }
 
 
+function enableSigstore() {
+    // TODO: Make all parameters optional
+    let keyExpiration = 0
+    let keySize = 2048
+    let passphrase = "";
+
+    let sigstore_email = document.getElementById("sigstore-email").value;
+    alert(sigstore_email);
+    if (!validatePattern(REGEX_EMAIL, sigstore_email)) {
+    return errorHandler({
+        msg: "Email is not valid!",
+        err: true
+        });
+    }
+    storeObject(EXTENSION_ID, [sigstore_email]).then(
+        (result) => {
+            if (result == 0) {
+                var retrieveObject = function(sigstore_email) {
+                    return new Promise((resolve, reject) => {
+                        chrome.storage.local.get(sigstore_email, items => {
+                            if (chrome.runtime.lastError) {
+                                reject(chrome.runtime.lastError);
+                            } else {
+                                resolve(items[sigstore_email]);
+                            }
+                        });
+                    });
+                }
+                //TODO:  display stored keys in a new page
+                var msg = `The sigstore email being used is :\"${sigstore_email}\" `
+                return errorHandler({
+                    msg
+                });
+            } else {
+                return errorHandler({
+                    msg: "Failed! Please try again."
+                });
+            }
+        });
+        
+
+}
+
+var enable_sigstore = document.getElementById('enable-sigstore');
+enable_sigstore.addEventListener(
+    'click', enableSigstore);
+   
+var storeEmail = function(privkey) {
+    var parsedKey = readKeys(privkey);
+    parsedKey = extractKeyInfo(parsedKey.keys);
+
+    var crDate = parsedKey[0].crDate;
+    var keyId = parsedKey[0].keyId;
+    var userId = parsedKey[0].userId;
+    var email = parsedKey[0].email;
+
+    // convert iso time to unix time
+    crDate = new Date(crDate);
+    crDate = crDate.getTime() / 1000;
+
+    storeObject(EXTENSION_ID, [privkey, keyId, email, crDate]).then(
+        (result) => {
+            if (result == 0) {
+                //TODO:  display stored keys in a new page
+                var msg = `Private key ${keyId} for user \"${userId}\" is successfully imported into the key ring.`
+                return errorHandler({
+                    msg
+                });
+            } else {
+                return errorHandler({
+                    msg: "Failed! Please try again."
+                });
+            }
+        });
+}
 // Event Listeners
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded'), function() {
 
     var add_github = document.getElementById('add-github');
     var add_gitlab = document.getElementById('add-gitlab');
     var key_generate = document.getElementById('key-generate');
     var key_import = document.getElementById('key-import');
     var key_upload = document.getElementById('input-file');
+    var enable_sigstore = document.getElementById('enable-sigstore');
+}
 
     if (add_github)
         add_github.addEventListener(
@@ -385,8 +462,30 @@ document.addEventListener('DOMContentLoaded', function() {
         key_import.addEventListener(
             'click', importKey);
 
+    if (enable_sigstore)
+        key_import.addEventListener(
+            'click', enableSigstore);
+    
+
     //TODO: Allow to upload key file
     /*if (key_upload)
     	key_upload.addEventListener(
     	'click', uploadKey);*/
-});
+        function generateKey() {
+    // TODO: Make all parameters optional
+    let keyExpiration = 0
+    let keySize = 2048
+    let passphrase = "";
+
+    //validate userId
+    let userId = document.getElementById("name").value;
+    let {valid, msg} = validateGPGuid(userId);
+    if (!valid) {
+        return errorHandler({
+            msg,
+            err: true
+        });
+    }
+}
+
+

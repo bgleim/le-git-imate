@@ -238,3 +238,8 @@ function getFilePath_GH(dirs) {
 function encode_utf8(s) {
 	return unescape(encodeURIComponent(s));
 }
+
+function sayHelloVIP() {
+
+    console.log("test vipo 1243432");
+}

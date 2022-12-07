@@ -4,7 +4,7 @@ var SCRIPTS = ["./libs/jquery.min.js", "./libs/openpgp.js", "./libs/sha1.js", ".
 		"./config/setup.js", "./connection/request.js"];
 
 function injectScripts(files, after) {
-
+    console.log("injecting scripts...")
     var _this = this;
     _this.files = files;
     _this.js = [];
@@ -51,9 +51,9 @@ function setPopupWindow() {
             });
 
             //reload the page after key settings
-            window.location.reload(true);
+            /*window.location.reload(true);
             window.location.href = "chrome://extensions/"
-            window.location.reload(true);
+            window.location.reload(true);*/
         } else { // perform the user request if key is found
             chrome.browserAction.setPopup({
                 popup: 'app.html'
@@ -65,3 +65,8 @@ function setPopupWindow() {
 
 // Inject local scripts, and then set the popup window
 injectScripts(SCRIPTS, setPopupWindow);
+
+function sayHelloVIP() {
+
+    console.log("test vipo 1243432");
+}

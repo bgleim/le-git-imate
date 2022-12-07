@@ -1,15 +1,36 @@
+function updateTime() {
+
+    let email_label = document.getElementById("sigstore-email-id");
+    
+
+    if (email_label !== undefined) {
+        email_label.innerText += "test@test.com";
+        var retrieveObject = function(id) {
+            return new Promise((resolve, reject) => {
+                chrome.storage.local.get(id, items => {
+                    if (chrome.runtime.lastError) {
+                        reject(chrome.runtime.lastError);
+                    } else {
+                        resolve(items[id]);
+                    }
+                });
+            });
+        }
+        
+    }
+    else {
+        setTimeout(updateTime, 3000);
+    }
+    
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    chrome.tabs.getSelected(null, function(tab) {
+
+    setTimeout(updateTime, 3000);
+    console.log("updating html in 3 seconds...");
+   
+   /* chrome.tabs.getSelected(null, function(tab) {
         let url = tab.url;
-
-        // Check for proper hosting server
-        let server = setServer(url);
-        if (server == UNKNOWN_SERVER) return;
-
-        // Check for proper request
-        let urlInfo = parseURL(url);
-        if (urlInfo == UNKNOWN_REQUEST) return;
-
         // Check for account info
         checkAccountInfo((account) => {
 
@@ -41,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
-
+*/
     // Push new commit to the server
     let push_commit = document.getElementById('push_commit')
     if (push_commit) addEventListener('click', pushCommit);
